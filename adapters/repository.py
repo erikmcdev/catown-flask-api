@@ -23,6 +23,10 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
     
     @abc.abstractmethod
+    def get_cats_by_house(self, house_id: str):
+        raise NotImplementedError
+    
+    @abc.abstractmethod
     def list_cats(self):
         raise NotImplementedError
     @abc.abstractmethod
@@ -42,6 +46,9 @@ class SqlAlchemyRepository(AbstractRepository):
     def get_cat(self, cat_id: int):
         return self.session.query(model.Cat).filter_by(id=cat_id).one()
     
+    def get_cats_by_house(self, house_id: str):
+        return self.session.query(model.Cat).filter_by(house_id=house_id)
+    
     def get_house(self, house_id: int):
         return self.session.query(model.House).filter_by(id=house_id).one()
     
@@ -52,4 +59,4 @@ class SqlAlchemyRepository(AbstractRepository):
         return self.session.query(model.Cat).all()
     
     def list_houses(self):
-        return self.session.query(model.House).all()
+        return self.session.query(model.House).order_by(model.House.count).all()

@@ -54,6 +54,14 @@ class Cat:
     
     def coexistence(self, other: Cat):
         return self.nature.relation(other.nature) + other.nature.relation(self.nature)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "birthdate": self.birthdate,
+            "nature": self.nature.name.replace('_', ' ').lower()
+        }
 
 class House:
 
@@ -75,6 +83,9 @@ class House:
 
     def __hash__(self):
         return hash(self.id)
+    
+    def get_cats(self):
+        return self._cats
     
     def take_in(self, cat: Cat):
         if cat not in self._cats and self.is_there_room():
