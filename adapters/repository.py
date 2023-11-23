@@ -49,8 +49,8 @@ class SqlAlchemyRepository(AbstractRepository):
     def get_cats_by_house(self, house_id: str):
         return self.session.query(model.Cat).filter_by(house_id=house_id)
     
-    def get_house(self, house_id: int):
-        return self.session.query(model.House).filter_by(id=house_id).one()
+    def get_house(self, house_id: str):
+        return self.session.query(model.House).filter_by(id=house_id).one_or_none()
     
     def get_any_available_house(self) -> model.House:
         return self.session.query(model.House).filter(model.House.count < 4).first()

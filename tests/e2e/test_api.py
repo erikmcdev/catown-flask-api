@@ -46,43 +46,40 @@ def post_to_add_cat(house_id: str):
     return r.json()["id"], r.json()["count"]
 
 
-def get_valid_house_id():
+def get_valid_house_id(exclude = None):
     url = config.get_api_url()
     r = requests.get(f"{url}/houses")
+    assert r.status_code == 200
+    house = next((h for h in r.json() if h["id"] != exclude), None)
+    return house["id"]
+
+
+def get_valid_cat_id_for_transfer(exclude = None):
+    url = config.get_api_url()
+    r = requests.get(f"{url}/houses")
+    assert r.status_code == 200
+
+    house = next((h for h in r.json() if h["id"] != exclude and h["count"] > 0), None)
+    r = requests.get(f"{url}/cats", {"house_id": house["id"]})
     assert r.status_code == 200
     return r.json()[0]["id"]
 
 
-def get_valid_cat_id_for_transfer(exclude_house_id):
+def get_valid_house_id_for_transfer(exclude_house_id = None):
     url = config.get_api_url()
     r = requests.get(f"{url}/houses")
     assert r.status_code == 200
 
-    for house in r.json():
-        if house["id"] != exclude_house_id and house["count"] > 0:
-            house_id = house["id"]
-            break
-    r = requests.get(f"{url}/cats", {"house_id": house_id})
-    assert r.status_code == 200
-    return r.json()[0]["id"]
+    house = next((h for h in r.json() if h["id"] != exclude_house_id and h["count"] < 4), None)
 
-
-def get_valid_house_id_for_transfer(exclude_house_id):
-    url = config.get_api_url()
-    r = requests.get(f"{url}/houses")
-    assert r.status_code == 200
-
-    for house in r.json():
-        if house["id"] != exclude_house_id and house["count"] < 4:
-            return house["id"]
+    return house["id"]
 
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
 def test_transfer_path_returns_201():
-    house_id = get_valid_house_id()
-    origin_cat_id = post_to_add_cat(house_id)[0]
-    destiny_house_id = get_valid_house_id_for_transfer(house_id)
+    destiny_house_id = get_valid_house_id_for_transfer()
+    origin_cat_id = get_valid_cat_id_for_transfer(destiny_house_id)
 
     data = {"cat_id": origin_cat_id, "destiny_id": destiny_house_id}
 
