@@ -15,6 +15,7 @@ build/
 instance/
 .webassets-cache/
 .env
+.env.*
 
 # Virtual Environment
 venv/

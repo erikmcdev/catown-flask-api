@@ -22,10 +22,13 @@ def add_cat():
             request.json["name"],
             birthdate,
             model.Nature[request.json["nature"]],
-            request.json.get("house_id", None),
+            request.json["house_id"],
             unit_of_work.SqlAlchemyUnitOfWork(),
         )
-        return {"id": result[0], "count": result[1]}, 201
+        response = {"id": result["id"], "count": result["count"]}
+        if result["new_home_id"]: response["new_home_id"] = result["new_home_id"]
+        print(response)
+        return response, 201
     except (services.NotEnoughRoom, services.NoSuchHouse) as e:
         return {"message": str(e)}, 400
 
@@ -43,12 +46,17 @@ def transfer_endpoint():
 
     return {"house_id": destiny_id, "cat_id": result}, 201
 
+@app.route("/create_house", methods=["POST"])
+def create_house():
+    try:
+        result = services.create_house(unit_of_work.SqlAlchemyUnitOfWork())
+    except services.NoNeedForCreatingHouse as e:
+        return {"message": str(e)}, 400
+    return {"house_id": result}, 201
 
 @app.route("/houses", methods=["GET"])
 def houses_endpoint():
     result = services.list_houses(unit_of_work.SqlAlchemyUnitOfWork())
-    if not result:
-        return "not found", 404
     return jsonify(result), 200
 
 

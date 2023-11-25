@@ -7,19 +7,25 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
+    env_file:
+      - .env.local
     environment:
       - DB_HOST=postgres
+      - DB_USER=local
+      - DB_NAME=catown_local
       - DB_PASSWORD=abc123
+      - DB_PORT=5432
+      - ENV_FILE=.env.local
     volumes:
       - ./:/code
     ports:
       - "5005:80"
 
-
   postgres:
     image: postgres:9.6
     environment:
-      - POSTGRES_USER=allocation
+      - POSTGRES_DB=catown_local
+      - POSTGRES_USER=local
       - POSTGRES_PASSWORD=abc123
     ports:
       - "54321:5432"

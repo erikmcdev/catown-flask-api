@@ -59,7 +59,7 @@ def test_add_cat():
 
     cat_id = services.add_cat(
         "Felix", date(2021, 4, 28), model.Nature.PARTY_GOING, house.id, uow
-    )[0]
+    )["id"]
     assert uow.repo.get_cat(cat_id) is not None
     assert uow.repo.get_house(house.id) is not None
     assert uow.committed
@@ -74,10 +74,10 @@ def test_transfer():
 
     cat1_id = services.add_cat(
         "Felix", date(2021, 4, 28), model.Nature.PARTY_GOING, house.id, uow
-    )[0]
+    )["id"]
     cat2_id = services.add_cat(
         "Asura", date(2022, 8, 12), model.Nature.NINJA_INVESTIGATOR, house2.id, uow
-    )[0]
+    )["id"]
 
     result = services.transfer(house2.id, cat1_id, uow)
     assert result == str(cat1_id)
@@ -104,7 +104,7 @@ def test_transfer_error_not_enough_room():
     )
     cat5_id = services.add_cat(
         "Forbin", date(2020, 6, 15), model.Nature.COMFORT_CONNAISSEUR, house2.id, uow
-    )[0]
+    )["id"]
 
     with pytest.raises(
         services.NotEnoughRoom, match=f"Not enough room in {house.id} House"
