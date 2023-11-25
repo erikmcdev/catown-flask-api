@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import uuid
 from random import randint
 
@@ -30,12 +31,15 @@ def random_nature():
 
 def random_birthdate():
     return f"20{randint(12, 22)}-{randint(1, 12)}-{randint(1,28)}"
+
+
 def create_house():
     url = config.get_api_url()
     r = requests.post(f"{url}/create_house")
     assert r.status_code == 201
     house_id = r.json()["house_id"]
     return house_id
+
 
 def set_initial_state():
     url = config.get_api_url()
@@ -46,6 +50,7 @@ def set_initial_state():
     r = requests.get(f"{url}/houses")
     assert r.status_code == 200
     return r
+
 
 def post_to_add_cat(house_id: str) -> tuple(str, int):
     url = config.get_api_url()
@@ -61,19 +66,23 @@ def post_to_add_cat(house_id: str) -> tuple(str, int):
     assert r.status_code == 201
     response = r.json()
     print(response)
-    return {"id": response["id"], "count": response["count"], "new_home_id": response.get("new_home_id")}
+    return {
+        "id": response["id"],
+        "count": response["count"],
+        "new_home_id": response.get("new_home_id"),
+    }
 
 
-def get_valid_house_id(exclude = None):
+def get_valid_house_id(exclude=None):
     url = config.get_api_url()
     r = requests.get(f"{url}/houses")
     assert r.status_code == 200
-    
+
     house = next((h for h in r.json() if h["id"] != exclude), None)
     return house["id"]
 
 
-def get_valid_cat_id_for_transfer(exclude = None):
+def get_valid_cat_id_for_transfer(exclude=None):
     url = config.get_api_url()
     r = requests.get(f"{url}/houses")
     assert r.status_code == 200
@@ -84,7 +93,7 @@ def get_valid_cat_id_for_transfer(exclude = None):
     return r.json()[0]["id"], house["id"], house["count"]
 
 
-def get_valid_house_id_for_transfer(exclude = None):
+def get_valid_house_id_for_transfer(exclude=None):
     url = config.get_api_url()
     r = requests.get(f"{url}/houses")
     assert r.status_code == 200
@@ -94,26 +103,26 @@ def get_valid_house_id_for_transfer(exclude = None):
 
     return house["id"]
 
+
 def get_full_house():
     url = config.get_api_url()
     r = requests.get(f"{url}/houses")
     assert r.status_code == 200
     houses = r.json()
-    print('HOLAAAAA', houses)
-    house_id =  houses[-1]["id"] if len(houses) > 0 else create_house()
+    print("HOLAAAAA", houses)
+    house_id = houses[-1]["id"] if len(houses) > 0 else create_house()
     count = houses[-1]["count"] if len(houses) > 0 else 0
-    post_res = None
     while count < 4:
         post_res = post_to_add_cat(house_id)
         count = post_res["count"]
-    if post_res:
-        print(post_res)
+    if len(houses) < 2:
         new_home_id = post_res["new_home_id"]
         origin_cat_id = post_to_add_cat(new_home_id)["id"]
     else:
-        origin_house_id = houses[0]["id"] 
+        origin_house_id = houses[0]["id"]
         origin_cat_id = post_to_add_cat(origin_house_id)["id"]
     return {"destiny_id": house_id, "cat_id": origin_cat_id}
+
 
 @pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
@@ -137,4 +146,6 @@ def test_transfer_path_returns_400_and_error_message():
     url = config.get_api_url()
     r = requests.post(f"{url}/transfer", json=data_request)
     assert r.status_code == 400
-    assert r.json()["message"] == f"Not enough room in {data_request['destiny_id']} House"
+    assert (
+        r.json()["message"] == f"Not enough room in {data_request['destiny_id']} House"
+    )

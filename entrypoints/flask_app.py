@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from flask import Flask, jsonify, request
@@ -9,7 +10,8 @@ from service import services, unit_of_work
 
 orm.start_mappers()
 app = Flask(__name__)
-CORS(app, headers="Content-Type", expose_headers="Content-Type")
+domain = os.environ.get("CORS_DOMAIN")
+CORS(app, origins=domain, headers="Content-Type", expose_headers="Content-Type")
 
 
 @app.route("/add_cat", methods=["POST"])
@@ -26,7 +28,8 @@ def add_cat():
             unit_of_work.SqlAlchemyUnitOfWork(),
         )
         response = {"id": result["id"], "count": result["count"]}
-        if result["new_home_id"]: response["new_home_id"] = result["new_home_id"]
+        if result["new_home_id"]:
+            response["new_home_id"] = result["new_home_id"]
         print(response)
         return response, 201
     except (services.NotEnoughRoom, services.NoSuchHouse) as e:
@@ -46,6 +49,7 @@ def transfer_endpoint():
 
     return {"house_id": destiny_id, "cat_id": result}, 201
 
+
 @app.route("/create_house", methods=["POST"])
 def create_house():
     try:
@@ -53,6 +57,7 @@ def create_house():
     except services.NoNeedForCreatingHouse as e:
         return {"message": str(e)}, 400
     return {"house_id": result}, 201
+
 
 @app.route("/houses", methods=["GET"])
 def houses_endpoint():
