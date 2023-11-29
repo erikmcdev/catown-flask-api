@@ -4,7 +4,8 @@ COPY requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
 
 RUN mkdir -p /code
-COPY *.py /code/
+COPY . /code/
 WORKDIR /code
 ENV FLASK_APP=entrypoints/flask_app.py FLASK_DEBUG=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
-CMD flask run --host=0.0.0.0 --port=80
+RUN chmod +x /code/entrypoint.sh
+ENTRYPOINT ["sh","/code/entrypoint.sh"]
