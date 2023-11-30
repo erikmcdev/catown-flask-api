@@ -36,9 +36,9 @@ def add_cat():
         if result["new_home_id"]:
             response["new_home_id"] = result["new_home_id"]
         print(response)
-        return response, 201
+        return jsonify(response), 201
     except (services.NotEnoughRoom, services.NoSuchHouse) as e:
-        return {"message": str(e)}, 400
+        return jsonify({"message": str(e)}), 400
 
 
 @app.route("/transfer", methods=["POST"])
@@ -50,9 +50,9 @@ def transfer_endpoint():
             destiny_id, cat_id, unit_of_work.SqlAlchemyUnitOfWork()
         )
     except services.NotEnoughRoom as e:
-        return {"message": str(e)}, 400
+        return jsonify({"message": str(e)}), 400
 
-    return {"house_id": destiny_id, "cat_id": result}, 201
+    return jsonify({"house_id": destiny_id, "cat_id": result}), 201
 
 
 @app.route("/create_house", methods=["POST"])
@@ -60,8 +60,8 @@ def create_house():
     try:
         result = services.create_house(unit_of_work.SqlAlchemyUnitOfWork())
     except services.NoNeedForCreatingHouse as e:
-        return {"message": str(e)}, 400
-    return {"house_id": result}, 201
+        return jsonify({"message": str(e)}), 400
+    return jsonify({"house_id": result}), 201
 
 
 @app.route("/houses", methods=["GET"])
@@ -80,7 +80,7 @@ def cats_by_house_endpoint():
 
         return jsonify(result), 200
     except Exception as e:
-        return {"message": str(e)}, 400
+        return jsonify({"message": str(e)}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)
