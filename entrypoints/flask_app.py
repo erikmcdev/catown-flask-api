@@ -14,6 +14,13 @@ domain = os.environ.get("CORS_DOMAIN")
 CORS(app, origins=domain, headers="Content-Type", expose_headers="Content-Type")
 
 
+@app.before_request
+def before_request():
+    print(request.headers)
+    if request.headers.get("Api-Key") != os.environ.get("API_KEY"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+
 @app.route("/add_cat", methods=["POST"])
 def add_cat():
     try:
