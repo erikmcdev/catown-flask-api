@@ -13,13 +13,11 @@ app = Flask(__name__)
 domain = os.environ.get("CORS_DOMAIN")
 CORS(app, origins=domain, headers="Content-Type", expose_headers="Content-Type")
 
-
 @app.before_request
 def before_request():
     print(request.headers)
-    if request.headers.get("Api-Key") != os.environ.get("API_KEY"):
+    if not app.debug and request.headers.get("Api-Key") != os.environ.get("API_KEY"):
         return jsonify({"error": "Unauthorized"}), 401
-
 
 @app.route("/add_cat", methods=["POST"])
 def add_cat():
@@ -83,3 +81,6 @@ def cats_by_house_endpoint():
         return jsonify(result), 200
     except Exception as e:
         return {"message": str(e)}, 400
+
+if __name__ == "__main__":
+    app.run(debug=True)
