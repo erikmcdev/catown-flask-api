@@ -33,3 +33,7 @@ ENV/
 .docker/
 .env
 *.log
+
+# Deploy
+fly.toml
+Procfile

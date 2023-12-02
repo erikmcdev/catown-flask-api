@@ -3,3 +3,4 @@ docker-compose.yml
 Dockerfile
 docker-compose.override.yml
 venv
+fly.toml
