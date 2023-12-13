@@ -1,6 +1,6 @@
 # Catown API
 
-Catown API is a Flask-based API coded by me as a showcase project, designed for managing a virtual town of cats. It utilizes PostgresDB as a persistent storage solution, Alembic for database migrations, and incorporates design patterns such as Hexagonal Architecture, Test-Driven Development (TDD), and Domain-Driven Design (DDD). My potfolio React web consumes this API: https://erikdevarch.tech/houses
+Catown API is a Flask-based API as a showcase project, designed for managing a virtual town of cats. It utilizes PostgresDB as a persistent storage solution, Alembic for database migrations, and incorporates design patterns such as Hexagonal Architecture, Test-Driven Development (TDD), and Domain-Driven Design (DDD). My potfolio React web consumes this API: https://erikdevarch.tech/houses
 
 ## Features
 
